@@ -380,3 +380,22 @@
                 (recur coords
                        (conj segments (conj current cut-point))
                        [cut-point]))))))
+
+(def vincenty-distance-calculator (org.locationtech.spatial4j.distance.GeodesicSphereDistCalc$Vincenty.))
+
+(defn rand-point-in-radius [center-lat center-lon radius-meters]
+  (let [center (point center-lat center-lon)
+        offset (Math/sqrt (rand))
+        radius (* offset radius-meters)
+        offset-degrees (-> radius
+                           (distance-at-point->radians center)
+                           (radians->degrees))
+        angle-degrees (rand 360)]
+    (.pointOnBearing vincenty-distance-calculator
+                     center
+                     offset-degrees
+                     angle-degrees
+                     earth
+                     nil)
+    #_{:latitude (.getY point)
+     :longitude (.getX point)}))
